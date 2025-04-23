@@ -1,4 +1,4 @@
-// FeedScreen.tsx (hiển thị bài viết + nghề nghiệp + bình luận + nút Quan tâm)
+// FeedScreen.tsx (hiển thị bài viết + nghề nghiệp + bình luận + nút Quan tâm + NPC phản hồi)
 import React, { useEffect, useState } from 'react';
 import { ScrollView, View, Text, Pressable, TextInput, Button, TouchableOpacity } from 'react-native';
 import axios from 'axios';
@@ -30,15 +30,36 @@ export default function FeedScreen() {
 
   const handleComment = async (postId) => {
     try {
+      const userName = 'Người dùng'; // lấy tên người dùng thật nếu có
       await axios.post('/comments', {
         postId,
-        author: 'USER_ID', // thay bằng user thực tế
+        author: 'USER_ID',
         content: newComment[postId]
       });
       setNewComment((prev) => ({ ...prev, [postId]: '' }));
       fetchComments(postId);
+
+      const post = posts.find(p => p._id === postId);
+      if (post?.author?.behavior?.attitude && post?.author?.name) {
+        const replyMap = {
+          'hòa nhã': `Cảm ơn đạo hữu ${userName} đã để lại lời nhắn 🌸`,
+          'nghiêm khắc': `Hãy giữ lời lẽ nghiêm túc hơn, ${userName}.`,
+          'nóng tính': `Ngươi muốn gây chuyện à, ${userName}?`,
+          'lắm lời': `Cũng dài dòng như ta đó nha ${userName} 😆`,
+          'bí ẩn': `Lời ngươi nói... nghe mà chẳng rõ ý gì, nhưng hay đấy.`
+        };
+        const attitude = post.author.behavior.attitude;
+        const reply = replyMap[attitude] || `Ừm, ta biết rồi.`;
+
+        await axios.post('/comments', {
+          postId,
+          author: post.author._id,
+          content: reply
+        });
+        fetchComments(postId);
+      }
     } catch (err) {
-      console.error('Lỗi khi gửi bình luận:', err);
+      console.error('Lỗi khi gửi bình luận hoặc NPC phản hồi:', err);
     }
   };
 
