@@ -1,4 +1,4 @@
-// FeedScreen.tsx (hiển thị bài viết + nghề nghiệp + bình luận + nút Quan tâm + NPC phản hồi)
+// FeedScreen.tsx (gọi feed cá nhân hóa từ backend)
 import React, { useEffect, useState } from 'react';
 import { ScrollView, View, Text, Pressable, TextInput, Button, TouchableOpacity } from 'react-native';
 import axios from 'axios';
@@ -12,7 +12,8 @@ export default function FeedScreen() {
 
   const fetchPosts = async () => {
     try {
-      const res = await axios.get('/posts');
+      const userId = 'USER_ID'; // 🟡 Thay bằng user thực tế sau này
+      const res = await axios.get(`/feed?userId=${userId}`);
       setPosts(res.data);
     } catch (err) {
       console.error('Lỗi khi lấy feed:', err);
@@ -30,7 +31,7 @@ export default function FeedScreen() {
 
   const handleComment = async (postId) => {
     try {
-      const userName = 'Người dùng'; // lấy tên người dùng thật nếu có
+      const userName = 'Người dùng';
       await axios.post('/comments', {
         postId,
         author: 'USER_ID',
