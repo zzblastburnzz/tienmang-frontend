@@ -1,7 +1,6 @@
-// CharacterProfileScreen.tsx (đã gộp SocialLink)
+// CharacterProfileScreen.tsx (dùng route.params thay useParams)
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
 import { getSocialLinks } from '../services/sociallinkService';
 
 type CharacterProfile = {
@@ -18,8 +17,8 @@ type CharacterProfile = {
   ngoTinh?: number;
 };
 
-export default function CharacterProfileScreen() {
-  const { id } = useParams();
+export default function CharacterProfileScreen({ route }) {
+  const { id } = route.params;
   const [profile, setProfile] = useState<CharacterProfile | null>(null);
   const [viewerTuVi, setViewerTuVi] = useState('Phàm nhân');
   const [relationship, setRelationship] = useState<any | null>(null);

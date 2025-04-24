@@ -1,11 +1,11 @@
-// AppNavigator.tsx
+// AppNavigator.tsx (sửa lại đường dẫn import theo cấu trúc src/screens/)
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import FeedScreen from './screens/FeedScreen';
-import CharacterProfileScreen from './screens/CharacterProfileScreen';
-import FriendCenterScreen from './screens/FriendCenterScreen';
-import ChatScreen from './screens/ChatScreen';
-import JobBoardScreen from './screens/JobBoardScreen';
+import FeedScreen from './src/screens/FeedScreen';
+import CharacterProfileScreen from './src/screens/CharacterProfileScreen';
+import FriendCenterScreen from './src/screens/FriendCenterScreen';
+import ChatScreen from './src/screens/ChatScreen';
+import JobBoardScreen from './src/screens/JobBoardScreen';
 
 const Stack = createNativeStackNavigator();
 
