@@ -1,4 +1,4 @@
-// FeedScreen.tsx (gọi feed cá nhân hóa từ backend)
+// FeedScreen.tsx (test bằng userId có thật)
 import React, { useEffect, useState } from 'react';
 import { ScrollView, View, Text, Pressable, TextInput, Button, TouchableOpacity } from 'react-native';
 import axios from 'axios';
@@ -12,9 +12,10 @@ export default function FeedScreen() {
 
   const fetchPosts = async () => {
     try {
-      const userId = 'USER_ID'; // 🟡 Thay bằng user thực tế sau này
+      const userId = '662e8cf5ac57ae705b9b3041'; // ✅ NPC mẫu có thật
       const res = await axios.get(`/feed?userId=${userId}`);
       setPosts(res.data);
+      if (res.data.length === 0) console.warn('Không có bài viết nào được trả về!');
     } catch (err) {
       console.error('Lỗi khi lấy feed:', err);
     }
@@ -34,7 +35,7 @@ export default function FeedScreen() {
       const userName = 'Người dùng';
       await axios.post('/comments', {
         postId,
-        author: 'USER_ID',
+        author: '662e8cf5ac57ae705b9b3041',
         content: newComment[postId]
       });
       setNewComment((prev) => ({ ...prev, [postId]: '' }));
@@ -66,7 +67,7 @@ export default function FeedScreen() {
 
   const handleLike = async (postId) => {
     try {
-      await axios.post('/posts/like', { postId, userId: 'USER_ID' });
+      await axios.post('/posts/like', { postId, userId: '662e8cf5ac57ae705b9b3041' });
       fetchPosts();
     } catch (err) {
       console.error('Lỗi khi like bài viết:', err);
