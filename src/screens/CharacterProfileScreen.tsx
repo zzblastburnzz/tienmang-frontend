@@ -1,6 +1,6 @@
 // CharacterProfileScreen.tsx (dùng route.params thay useParams)
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../services/axiosInstance';
 import { getSocialLinks } from '../services/sociallinkService';
 
 type CharacterProfile = {

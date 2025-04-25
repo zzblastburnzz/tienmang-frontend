@@ -1,7 +1,7 @@
 // FriendCenterScreen.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Button, Pressable } from 'react-native';
-import axios from 'axios';
+import axios from '../services/axiosInstance';
 
 export default function FriendCenterScreen() {
   const userId = 'USER_ID'; // 🟡 Thay bằng ID thật nếu có

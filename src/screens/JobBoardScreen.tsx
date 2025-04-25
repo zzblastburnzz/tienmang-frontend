@@ -1,7 +1,7 @@
 // JobBoardScreen.tsx (nâng cấp: xem chi tiết + ứng tuyển)
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal, Button } from 'react-native';
-import axios from 'axios';
+import axios from '../services/axiosInstance';
 
 export default function JobBoardScreen() {
   const [jobs, setJobs] = useState([]);

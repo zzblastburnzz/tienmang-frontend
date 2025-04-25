@@ -1,71 +1,118 @@
-// ChatScreen.tsx (tích hợp AcceptChatJobButton)
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TextInput, Button } from 'react-native';
-import axios from 'axios';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import axios from '../services/axiosInstance';
 import AcceptChatJobButton from '../components/AcceptChatJobButton';
 
 export default function ChatScreen({ route }) {
   const { conversationId, userId, npcId } = route.params;
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
-  const [latestJobId, setLatestJobId] = useState<string | null>(null);
+  const [newMsg, setNewMsg] = useState('');
 
   const fetchMessages = async () => {
-    const res = await axios.get(`/messages/${conversationId}`);
-    setMessages(res.data);
-  };
-
-  const handleSend = async () => {
-    const res = await axios.post(`/messages/${conversationId}`, {
-      sender: userId,
-      text: input
-    });
-    setMessages(prev => [...prev, ...res.data]);
-    setInput('');
-
-    // kiểm tra có job trong phản hồi không
-    const jobText = res.data.find(m => m.text.includes('Ta sẽ giao nhiệm vụ này cho ngươi:'));
-    if (jobText) {
-      const jobIdMatch = jobText.text.match(/nhiệm vụ này cho ngươi: (.+?)\./);
-      if (jobIdMatch) {
-        const title = jobIdMatch[1];
-        const jobRes = await axios.get(`/jobs/by-title`, { params: { title } });
-        if (jobRes.data?._id) setLatestJobId(jobRes.data._id);
-      }
+    try {
+      const res = await axios.get(`/chat/conversation/${conversationId}`);
+      setMessages(res.data);
+    } catch (err) {
+      console.error('Lỗi lấy tin nhắn:', err);
     }
   };
 
-  useEffect(() => {
-    fetchMessages();
-  }, []);
+  const handleSend = async () => {
+    if (!newMsg.trim()) return;
+    try {
+      const res = await axios.post('/chat/send', {
+        conversationId,
+        sender: userId,
+        receiver: npcId,
+        text: newMsg
+      });
+      setMessages(prev => [...prev, res.data]);
+      setNewMsg('');
+    } catch (err) {
+      console.error('Lỗi gửi tin nhắn:', err);
+    }
+  };
+
+  useEffect(() => { fetchMessages(); }, []);
 
   return (
-    <View style={{ flex: 1, padding: 16 }}>
-      <ScrollView style={{ flex: 1 }}>
-        {messages.map((m, i) => (
-          <View key={i} style={{ marginVertical: 4 }}>
-            <Text><Text style={{ fontWeight: 'bold' }}>{m.sender === userId ? 'Bạn' : 'NPC'}:</Text> {m.text}</Text>
+    <View style={styles.container}>
+      <ScrollView style={styles.messageContainer}>
+        {messages.map((msg, index) => (
+          <View
+            key={index}
+            style={[
+              styles.messageBubble,
+              msg.sender === userId ? styles.rightBubble : styles.leftBubble
+            ]}
+          >
+            <Text style={styles.messageText}>{msg.text}</Text>
+            {msg.jobSuggestion && (
+              <AcceptChatJobButton jobId={msg.jobSuggestion} npcId={npcId} userId={userId} />
+            )}
           </View>
         ))}
-        {latestJobId && (
-          <AcceptChatJobButton
-            jobId={latestJobId}
-            npcId={npcId}
-            userId={userId}
-            onAccepted={() => setLatestJobId(null)}
-          />
-        )}
       </ScrollView>
-
-      <View style={{ flexDirection: 'row', marginTop: 8 }}>
+      <View style={styles.inputRow}>
         <TextInput
-          value={input}
-          onChangeText={setInput}
+          style={styles.input}
+          value={newMsg}
+          onChangeText={setNewMsg}
           placeholder="Nhập tin nhắn..."
-          style={{ flex: 1, borderWidth: 1, borderRadius: 8, padding: 8 }}
+          placeholderTextColor="#999"
         />
-        <Button title="Gửi" onPress={handleSend} />
+        <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
+          <Text style={styles.sendButtonText}>Gửi</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#f5efe0' },
+  messageContainer: { padding: 12 },
+  messageBubble: {
+    maxWidth: '80%',
+    padding: 10,
+    marginVertical: 4,
+    borderRadius: 12,
+    backgroundColor: '#fff5da',
+  },
+  leftBubble: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#fff5da',
+    borderColor: '#b59b72',
+    borderWidth: 1
+  },
+  rightBubble: {
+    alignSelf: 'flex-end',
+    backgroundColor: '#d3f4e4',
+    borderColor: '#7fbf9e',
+    borderWidth: 1
+  },
+  messageText: { fontSize: 16 },
+  inputRow: {
+    flexDirection: 'row',
+    padding: 8,
+    borderTopWidth: 1,
+    borderColor: '#ccc',
+    backgroundColor: '#faf5e5'
+  },
+  input: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ccc'
+  },
+  sendButton: {
+    marginLeft: 8,
+    backgroundColor: '#6a4e34',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8
+  },
+  sendButtonText: { color: '#fff', fontWeight: 'bold' }
+});

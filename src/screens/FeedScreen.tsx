@@ -1,7 +1,7 @@
 // FeedScreen.tsx (test bằng userId có thật)
 import React, { useEffect, useState } from 'react';
 import { ScrollView, View, Text, Pressable, TextInput, Button, TouchableOpacity } from 'react-native';
-import axios from 'axios';
+import axios from '../services/axiosInstance';
 import { useNavigation } from '@react-navigation/native';
 
 export default function FeedScreen() {

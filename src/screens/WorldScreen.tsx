@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../services/axiosInstance';
 
 export default function WorldScreen() {
   const [worlds, setWorlds] = useState([]);
