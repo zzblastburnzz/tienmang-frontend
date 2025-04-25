@@ -4,6 +4,9 @@
       "eas": {
         "projectId": "27f36884-cec7-4a00-b260-a5197743048c"
       }
+    },
+    "android": {
+      "package": "com.congthanhhp92.tienmangfrontend"
     }
   }
 }

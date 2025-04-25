@@ -1,9 +1,9 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import FeedScreen from './FeedScreen';
-import ChatListScreen from './ChatListScreen';
-import FactionScreen from './FactionScreen';
-import MyProfileScreen from './MyProfileScreen';
+import FeedScreen from '.src/screens/FeedScreen';
+import ChatListScreen from '.src/screens/ChatListScreen';
+import FactionScreen from '.src/screens/FactionScreen';
+import MyProfileScreen from '.src/screens/MyProfileScreen';
 
 const Tab = createBottomTabNavigator();
 
