@@ -1,127 +1,139 @@
-// FeedScreen.tsx (test bằng userId có thật)
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View, Text, Pressable, TextInput, Button, TouchableOpacity } from 'react-native';
+import { ScrollView, Text, TextInput, TouchableOpacity, View, StyleSheet } from 'react-native';
 import axios from '../services/axiosInstance';
+import COLORS from '../theme/colors';
+import PaperView from '../theme/components/PaperView';
+import PrimaryButton from '../theme/components/PrimaryButton';
 import { useNavigation } from '@react-navigation/native';
 
 export default function FeedScreen() {
   const [posts, setPosts] = useState([]);
   const [comments, setComments] = useState({});
-  const [newComment, setNewComment] = useState({});
+  const userId = '662e8cf5ac57ae705b9b3041'; // demo
+
   const navigation = useNavigation();
 
-  const fetchPosts = async () => {
+  const fetchFeed = async () => {
     try {
-      const userId = '662e8cf5ac57ae705b9b3041'; // ✅ NPC mẫu có thật
       const res = await axios.get(`/feed?userId=${userId}`);
       setPosts(res.data);
-      if (res.data.length === 0) console.warn('Không có bài viết nào được trả về!');
     } catch (err) {
-      console.error('Lỗi khi lấy feed:', err);
-    }
-  };
-
-  const fetchComments = async (postId) => {
-    try {
-      const res = await axios.get(`/comments?postId=${postId}`);
-      setComments((prev) => ({ ...prev, [postId]: res.data }));
-    } catch (err) {
-      console.error('Lỗi khi lấy bình luận:', err);
-    }
-  };
-
-  const handleComment = async (postId) => {
-    try {
-      const userName = 'Người dùng';
-      await axios.post('/comments', {
-        postId,
-        author: '662e8cf5ac57ae705b9b3041',
-        content: newComment[postId]
-      });
-      setNewComment((prev) => ({ ...prev, [postId]: '' }));
-      fetchComments(postId);
-
-      const post = posts.find(p => p._id === postId);
-      if (post?.author?.behavior?.attitude && post?.author?.name) {
-        const replyMap = {
-          'hòa nhã': `Cảm ơn đạo hữu ${userName} đã để lại lời nhắn 🌸`,
-          'nghiêm khắc': `Hãy giữ lời lẽ nghiêm túc hơn, ${userName}.`,
-          'nóng tính': `Ngươi muốn gây chuyện à, ${userName}?`,
-          'lắm lời': `Cũng dài dòng như ta đó nha ${userName} 😆`,
-          'bí ẩn': `Lời ngươi nói... nghe mà chẳng rõ ý gì, nhưng hay đấy.`
-        };
-        const attitude = post.author.behavior.attitude;
-        const reply = replyMap[attitude] || `Ừm, ta biết rồi.`;
-
-        await axios.post('/comments', {
-          postId,
-          author: post.author._id,
-          content: reply
-        });
-        fetchComments(postId);
-      }
-    } catch (err) {
-      console.error('Lỗi khi gửi bình luận hoặc NPC phản hồi:', err);
+      console.error('Lỗi lấy feed:', err);
     }
   };
 
   const handleLike = async (postId) => {
     try {
-      await axios.post('/posts/like', { postId, userId: '662e8cf5ac57ae705b9b3041' });
-      fetchPosts();
+      await axios.post(`/posts/${postId}/like`, { userId });
+      fetchFeed();
     } catch (err) {
-      console.error('Lỗi khi like bài viết:', err);
+      console.error('Lỗi like:', err);
+    }
+  };
+
+  const handleComment = async (postId) => {
+    if (!comments[postId]?.trim()) return;
+    try {
+      await axios.post(`/comments`, {
+        postId,
+        userId,
+        content: comments[postId]
+      });
+      setComments({ ...comments, [postId]: '' });
+      fetchFeed();
+    } catch (err) {
+      console.error('Lỗi gửi comment:', err);
     }
   };
 
   useEffect(() => {
-    fetchPosts();
+    fetchFeed();
   }, []);
 
   return (
-    <ScrollView style={{ padding: 16 }}>
-      <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 16 }}>📰 Bảng Tin Tu Tiên</Text>
-
+    <ScrollView style={styles.container}>
       {posts.map((post, index) => (
-        <View
-          key={index}
-          style={{ marginBottom: 24, padding: 12, backgroundColor: '#f9f9f9', borderRadius: 8 }}
-        >
-          <Pressable onPress={() => navigation.navigate('CharacterProfile', { id: post.author?._id })}>
-            <Text style={{ fontWeight: 'bold', color: '#3b82f6' }}>{post.author?.name || 'NPC Ẩn Danh'}</Text>
-          </Pressable>
-          {post.author?.role && (
-            <Text style={{ fontSize: 12, fontStyle: 'italic', color: '#666' }}>
-              🧭 Nghề nghiệp: {post.author.role}
-            </Text>
-          )}
-          <Text style={{ marginTop: 4 }}>{post.content}</Text>
-          <Text style={{ fontSize: 12, color: '#888', marginTop: 4 }}>
-            Đăng lúc: {new Date(post.createdAt).toLocaleString()}
-          </Text>
-
-          <TouchableOpacity onPress={() => handleLike(post._id)}>
-            <Text style={{ color: '#e11d48', marginTop: 8 }}>❤️ Quan tâm ({post.likes || 0})</Text>
+        <PaperView key={index}>
+          <TouchableOpacity onPress={() => navigation.navigate('CharacterProfile', { id: post.author._id })}>
+            <Text style={styles.author}>{post.author?.name} ({post.author?.job})</Text>
           </TouchableOpacity>
+          <Text style={styles.meta}>{new Date(post.createdAt).toLocaleString()}</Text>
+          <Text style={styles.content}>{post.content}</Text>
 
-          {/* Bình luận */}
-          <View style={{ marginTop: 8 }}>
-            <Text style={{ fontWeight: 'bold', marginBottom: 4 }}>💬 Bình luận:</Text>
-            {(comments[post._id] || []).map((cmt, idx) => (
-              <Text key={idx} style={{ fontSize: 13, marginLeft: 8 }}>
-                • <Text style={{ fontWeight: 'bold' }}>{cmt.authorName}</Text>: {cmt.content}
-              </Text>
+          <PrimaryButton title="Quan tâm" onPress={() => handleLike(post._id)} />
+
+          <View style={styles.commentSection}>
+            <Text style={styles.subheading}>Bình luận:</Text>
+            {post.comments?.map((cmt, i) => (
+              <View key={i} style={styles.commentItem}>
+                <Text style={styles.commentName}>{cmt.author?.name}:</Text>
+                <Text style={styles.commentText}>{cmt.content}</Text>
+              </View>
             ))}
             <TextInput
-              value={newComment[post._id] || ''}
-              onChangeText={(text) => setNewComment((prev) => ({ ...prev, [post._id]: text }))}
-              placeholder="Viết bình luận..."
-              style={{ borderBottomWidth: 1, fontSize: 13, marginTop: 4 }}
+              style={styles.commentInput}
+              value={comments[post._id] || ''}
+              onChangeText={(text) => setComments({ ...comments, [post._id]: text })}
+              placeholder="Viết phản hồi..."
+              placeholderTextColor="#aaa"
             />
-            <Button title="Gửi" onPress={() => handleComment(post._id)} />
+            <PrimaryButton title="Gửi" onPress={() => handleComment(post._id)} />
           </View>
-        </View>
+        </PaperView>
       ))}
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: COLORS.background,
+    padding: 12,
+  },
+  author: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    color: COLORS.accent,
+  },
+  meta: {
+    fontSize: 12,
+    color: '#777',
+    marginBottom: 6,
+  },
+  content: {
+    fontSize: 16,
+    color: COLORS.text,
+    marginBottom: 10,
+  },
+  commentSection: {
+    marginTop: 12,
+  },
+  subheading: {
+    fontWeight: 'bold',
+    color: COLORS.accent,
+    marginBottom: 4,
+  },
+  commentItem: {
+    flexDirection: 'row',
+    marginBottom: 4,
+  },
+  commentName: {
+    fontWeight: '600',
+    marginRight: 4,
+    color: COLORS.text,
+  },
+  commentText: {
+    color: COLORS.text,
+  },
+  commentInput: {
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginTop: 6,
+    marginBottom: 8,
+    backgroundColor: '#fff',
+    color: COLORS.text,
+  }
+});

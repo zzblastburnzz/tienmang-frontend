@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../services/axiosInstance';
+import PaperView from '../theme/components/PaperView';
+import PrimaryButton from '../theme/components/PrimaryButton';
+import COLORS from '../theme/colors';
 
 type Faction = {
   name: string;

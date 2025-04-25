@@ -2,6 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Button, Pressable } from 'react-native';
 import axios from '../services/axiosInstance';
+import PaperView from '../theme/components/PaperView';
+import PrimaryButton from '../theme/components/PrimaryButton';
+import COLORS from '../theme/colors';
 
 export default function FriendCenterScreen() {
   const userId = 'USER_ID'; // 🟡 Thay bằng ID thật nếu có
