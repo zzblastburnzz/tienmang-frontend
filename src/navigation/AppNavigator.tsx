@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import ChatListScreen from './src/screens/ChatListScreen';
+import ChatScreen from './src/screens/ChatScreen';
 import FeedScreen from './src/screens/FeedScreen';
 import FactionScreen from './src/screens/FactionScreen';
 import MyProfileScreen from './src/screens/MyProfileScreen';
@@ -13,7 +13,7 @@ const Stack = createNativeStackNavigator();
 function MainTabs() {
   return (
     <Tab.Navigator initialRouteName="Feed">
-      <Tab.Screen name="Chat" component={ChatListScreen} options={{ title: 'Trò chuyện' }} />
+      <Tab.Screen name="Chat" component={ChatScreen} options={{ title: 'Trò chuyện' }} />
       <Tab.Screen name="Feed" component={FeedScreen} options={{ title: 'Bảng tin' }} />
       <Tab.Screen name="Faction" component={FactionScreen} options={{ title: 'Tông phái' }} />
       <Tab.Screen name="Profile" component={MyProfileScreen} options={{ title: 'Cá nhân' }} />
