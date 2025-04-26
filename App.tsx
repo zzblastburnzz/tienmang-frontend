@@ -1,10 +1,16 @@
 // App.tsx
+import 'react-native-gesture-handler';
 import React from 'react';
-import { registerRootComponent } from 'expo';
+import { NavigationContainer } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AppNavigator from './src/navigation/AppNavigator';
 
 export default function App() {
-  return <AppNavigator />;
+  return (
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <AppNavigator />
+      </NavigationContainer>
+    </SafeAreaProvider>
+  );
 }
-
-registerRootComponent(App);
