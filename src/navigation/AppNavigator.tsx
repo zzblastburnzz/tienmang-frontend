@@ -1,10 +1,10 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import ChatScreen from './src/screens/ChatScreen';
-import FeedScreen from './src/screens/FeedScreen';
-import FactionScreen from './src/screens/FactionScreen';
-import MyProfileScreen from './src/screens/MyProfileScreen';
-import CharacterProfileScreen from './src/screens/CharacterProfileScreen';
+import ChatScreen from '../screens/ChatScreen';
+import FeedScreen from '../screens/FeedScreen';
+import FactionScreen from '../screens/FactionScreen';
+import MyProfileScreen from '../screens/MyProfileScreen';
+import CharacterProfileScreen from '../screens/CharacterProfileScreen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const Tab = createBottomTabNavigator();
