@@ -1,14 +1,23 @@
 import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AuthNavigator from './AuthNavigator';
+import AuthLoadingScreen from '../screens/AuthLoadingScreen';
 import ChatScreen from '../screens/ChatScreen';
 import FeedScreen from '../screens/FeedScreen';
 import FactionScreen from '../screens/FactionScreen';
 import MyProfileScreen from '../screens/MyProfileScreen';
 import CharacterProfileScreen from '../screens/CharacterProfileScreen';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
+export type RootStackParamList = {
+  AuthLoading: undefined;
+  Auth: undefined;
+  Home: undefined;
+  CharacterProfile: { id: string };
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
 
 function MainTabs() {
   return (
@@ -23,8 +32,10 @@ function MainTabs() {
 
 export default function AppNavigator() {
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="Home" component={MainTabs} options={{ headerShown: false }} />
+    <Stack.Navigator initialRouteName="AuthLoading" screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="AuthLoading" component={AuthLoadingScreen} />
+      <Stack.Screen name="Auth" component={AuthNavigator} />
+      <Stack.Screen name="Home" component={MainTabs} />
       <Stack.Screen name="CharacterProfile" component={CharacterProfileScreen} options={{ title: 'Hồ sơ nhân vật' }} />
     </Stack.Navigator>
   );

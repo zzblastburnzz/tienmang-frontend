@@ -7,6 +7,9 @@
     },
     "android": {
       "package": "com.congthanhhp92.tienmangfrontend"
-    }
+    },
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }
